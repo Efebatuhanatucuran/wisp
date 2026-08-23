@@ -29,6 +29,7 @@ class of problem *before* you run the server, without ever connecting to it.
 | R008 | Prompt-injection-style text embedded directly in the config itself |
 | R009 | Docker images not pinned to a version/digest (floating `:latest`) |
 | R010 | Server package has a known published vulnerability (CVE/GHSA via osv.dev) — opt-in, see below |
+| R011 | (INFO) Credential correctly externalized via an environment-variable passthrough |
 
 Each finding gets a severity (INFO → CRITICAL) and the whole scan rolls up into a single
 0–100 risk score.

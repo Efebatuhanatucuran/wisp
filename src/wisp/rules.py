@@ -340,3 +340,23 @@ def r009_floating_docker_tag(entry: ServerEntry) -> list[Finding]:
         evidence=entry.command_line,
         remediation="Pin to a specific version tag or, better, an image digest (@sha256:...).",
     )]
+
+
+# --- R011: credential correctly externalized (informational) ----------------
+
+@rule
+def r011_env_var_passthrough_info(entry: ServerEntry) -> list[Finding]:
+    findings = []
+    for key, value in entry.env.items():
+        if not isinstance(value, str):
+            continue
+        if _SECRET_KEY_RE.search(key) and _looks_like_var_ref(value):
+            findings.append(_finding(
+                entry, "R011", Severity.INFO,
+                "Credential correctly externalized via environment variable",
+                f"Server '{entry.name}' references '{key}' via an environment-variable "
+                f"passthrough ({value}) instead of a literal value — this is the right pattern.",
+                evidence=f"{key}={value}",
+                remediation="No action needed; keep secrets out of the config file like this.",
+            ))
+    return findings

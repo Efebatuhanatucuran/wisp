@@ -48,6 +48,27 @@ def test_privileged_docker_flagged():
     assert "R009" in rule_ids  # :latest tag
 
 
+def test_env_var_passthrough_flagged_info():
+    entries = discovery.parse_config_file(FIXTURES / "safe.mcp.json")
+    findings = _findings_for("github", entries)
+    assert any(f.rule_id == "R011" and f.severity.label == "INFO" for f in findings)
+
+
+def test_literal_secret_not_flagged_as_passthrough():
+    entries = discovery.parse_config_file(FIXTURES / "risky.mcp.json")
+    findings = _findings_for("unpinned-fetcher", entries)
+    assert not any(f.rule_id == "R011" for f in findings)
+
+
+def test_demo_config_covers_every_severity():
+    entries = discovery.parse_config_file(
+        Path(__file__).parent.parent / "src" / "wisp" / "examples" / "demo-config.json",
+    )
+    all_findings = [f for e in entries for f in rules.run_all_rules(e)]
+    severities = {f.severity.label for f in all_findings}
+    assert severities == {"CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"}
+
+
 def test_risk_score_lower_for_risky_config():
     from wisp.models import ScanResult
 

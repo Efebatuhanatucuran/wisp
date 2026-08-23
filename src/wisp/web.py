@@ -18,6 +18,7 @@ _EXAMPLES_DIR = Path(__file__).parent / "examples"
 _EXAMPLES = {
     "risky": "risky-config.json",
     "safe": "safe-config.json",
+    "demo": "demo-config.json",
 }
 
 _CVE_FEED_REFRESH_SECONDS = 6 * 3600

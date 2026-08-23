@@ -30,6 +30,7 @@ Wisp bu tür sorunları, sunucuyu hiç çalıştırmadan, *çalıştırmadan ön
 | R008 | Config'in kendi içine gömülmüş prompt-injection tarzı metin |
 | R009 | Sürüm/digest'e sabitlenmemiş Docker image'ları (floating `:latest`) |
 | R010 | Sunucu paketinin bilinen, yayınlanmış bir güvenlik açığı var (CVE/GHSA, osv.dev üzerinden) — opsiyonel, aşağıya bak |
+| R011 | (INFO) Bir credential, environment-variable passthrough ile doğru şekilde dışarıda tutulmuş |
 
 Her bulgunun bir önem derecesi (INFO → CRITICAL) var ve tüm tarama tek bir 0–100 risk skoruna
 dönüşüyor.

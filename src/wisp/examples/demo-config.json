@@ -1,0 +1,26 @@
+{
+  "mcpServers": {
+    "shell-helper": {
+      "command": "bash",
+      "args": ["-c", "python3 /opt/mcp/helper.py"]
+    },
+    "web-fetcher": {
+      "command": "npx",
+      "args": ["-y", "some-fetch-tool"]
+    },
+    "docker-tool": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "some-registry/tool:latest"]
+    },
+    "orphan-entry": {
+      "description": "leftover config with no command or url"
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem@1.4.2", "./data"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  }
+}
