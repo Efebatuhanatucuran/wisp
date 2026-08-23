@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wisp &mdash; MCP config scanner</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="wisp" id="wisp" aria-hidden="true">
+      <span class="wisp-spark s1"></span>
+      <span class="wisp-spark s2"></span>
+      <span class="wisp-spark s3"></span>
+      <div class="wisp-glow"></div>
+      <svg class="wisp-body" viewBox="0 0 64 80">
+        <path d="M32 4 C 50 20, 54 44, 40 62 C 34 70, 30 74, 32 78 C 22 74, 10 60, 12 42 C 14 22, 22 8, 32 4 Z" />
+      </svg>
+      <span class="wisp-eye"></span>
+    </div>
+    <div>
+      <h1>Wisp</h1>
+      <p class="tagline">mcp-sentinel &middot; static security scanner for MCP server configs</p>
+    </div>
+  </div>
+  <div id="score-badge" class="score-badge score-unknown">
+    <span class="score-value">&mdash;</span>
+    <span class="score-label">risk score</span>
+  </div>
+</header>
+
+<main>
+  <aside class="panel">
+    <h2>Config files</h2>
+    <div id="file-list" class="file-list">
+      <p class="muted">Loading&hellip;</p>
+    </div>
+
+    <div id="drop-zone" class="drop-zone">
+      <p>Drag &amp; drop a config file here</p>
+      <label class="file-picker-btn">
+        Choose file&hellip;
+        <input id="file-input" type="file" accept=".json,application/json" multiple hidden>
+      </label>
+    </div>
+
+    <div class="example-row">
+      <span class="muted small">Try an example:</span>
+      <button type="button" class="link-btn" data-example="risky">risky config</button>
+      <button type="button" class="link-btn" data-example="safe">safe config</button>
+    </div>
+
+    <form id="add-path-form" class="add-path-form">
+      <input id="add-path-input" type="text" placeholder="or type a path: /path/to/mcp.json" autocomplete="off">
+      <button type="submit">Add</button>
+    </form>
+
+    <label class="check-cve-toggle">
+      <input type="checkbox" id="check-cve-input" checked>
+      Check known CVEs (queries osv.dev)
+    </label>
+
+    <div class="actions">
+      <button id="rediscover-btn" type="button" class="secondary">Rediscover</button>
+      <button id="scan-btn" type="button" class="primary">Scan</button>
+    </div>
+
+    <div id="download-actions" class="download-actions" hidden>
+      <button id="download-json-btn" type="button" class="secondary small">Download JSON</button>
+      <button id="download-html-btn" type="button" class="secondary small">Download HTML</button>
+    </div>
+
+    <div id="summary" class="summary"></div>
+    <div id="error-banner" class="error-banner" hidden></div>
+  </aside>
+
+  <section class="panel results-panel">
+    <div class="results-header">
+      <h2>Findings</h2>
+      <div id="severity-filters" class="severity-filters"></div>
+    </div>
+    <div id="results" class="results">
+      <p class="muted">Select config files on the left and click Scan.</p>
+    </div>
+  </section>
+</main>
+
+<section class="panel cve-feed-panel">
+  <div class="results-header">
+    <div>
+      <h2>MCP CVE feed</h2>
+      <p class="tagline" id="cve-feed-meta">Loading&hellip;</p>
+    </div>
+    <button id="cve-feed-refresh-btn" type="button" class="secondary small">Refresh</button>
+  </div>
+  <div id="cve-feed-list" class="cve-feed-list">
+    <p class="muted">Loading recent MCP-related CVEs&hellip;</p>
+  </div>
+</section>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

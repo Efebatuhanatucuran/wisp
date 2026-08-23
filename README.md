@@ -22,6 +22,7 @@ finds that class of problem *before* you run the server, without ever connecting
 | R007 | Malformed/ambiguous server entries |
 | R008 | Prompt-injection-style text embedded directly in the config itself |
 | R009 | Docker images not pinned to a version/digest (floating `:latest`) |
+| R010 | Server package has a known published vulnerability (CVE/GHSA via osv.dev) — opt-in, see below |
 
 Each finding gets a severity (INFO → CRITICAL) and the whole scan rolls up into a single
 0–100 risk score.
@@ -30,6 +31,12 @@ Each finding gets a severity (INFO → CRITICAL) and the whole scan rolls up int
 
 ```bash
 pip install -e .
+```
+
+For the web UI too:
+
+```bash
+pip install -e ".[web]"
 ```
 
 (PyPI package coming later — for now, clone and install from source.)
@@ -47,6 +54,10 @@ mcp-sentinel scan --config path/to/mcp.json
 # Write JSON/HTML reports (HTML is a shareable one-pager):
 mcp-sentinel scan --json report.json --html report.html
 
+# Also cross-reference server packages against known CVEs via osv.dev
+# (the only flag that makes a network call; off by default):
+mcp-sentinel scan --check-cve
+
 # CI mode — exit non-zero if anything HIGH or above is found:
 mcp-sentinel scan --fail-on HIGH
 ```
@@ -59,21 +70,40 @@ mcp-sentinel scan --config examples/risky-config.json
 
 See [`examples/`](examples/) for a deliberately risky sample config and the report it produces.
 
-## Why config-only (no live connection)?
+## Web UI
 
-v1 is intentionally static: it parses the JSON your MCP client will hand a server, with no
-network calls and no code execution. That keeps it safe to run against configs you don't fully
-trust yet, and keeps the scope honest for what it actually checks. Live introspection (fetching
-a running server's tool list and scanning *tool descriptions* for prompt-injection payloads,
-similar to what [AgentDojo](https://github.com/ethz-spylab/agentdojo) benchmarks) is the natural
-next step — see [Roadmap](#roadmap).
+```bash
+mcp-sentinel serve
+```
+
+Opens a local dashboard (default `http://127.0.0.1:8765`) for scanning interactively instead of
+via the terminal: pick from auto-discovered configs, drag & drop a file, or load the bundled
+risky/safe examples; findings are grouped by server with severity filters, and reports can be
+downloaded as JSON or HTML. Two things it does that the CLI doesn't:
+
+- **CVE matching** (on by default, toggleable): cross-references every server package against
+  [osv.dev](https://osv.dev) and flags known vulnerabilities as R010 findings.
+- **MCP CVE feed**: a panel tracking recently published CVEs that mention "Model Context
+  Protocol" (via the [NVD](https://nvd.nist.gov) keyword search), refreshed automatically in the
+  background every 6 hours while `serve` is running, plus a manual refresh button.
+
+## Why config-only (no live connection) by default?
+
+The core scanner is intentionally static: it parses the JSON your MCP client will hand a server,
+with no network calls and no code execution. That keeps it safe to run against configs you don't
+fully trust yet, and keeps the scope honest for what it actually checks. `--check-cve` (CLI) and
+the web UI are the one deliberate exception — they query osv.dev/NVD to check for *known*,
+already-published vulnerabilities, not to introspect anything about your machine. Live
+introspection (fetching a running server's tool list and scanning *tool descriptions* for
+prompt-injection payloads, similar to what [AgentDojo](https://github.com/ethz-spylab/agentdojo)
+benchmarks) is the natural next step — see [Roadmap](#roadmap).
 
 ## Roadmap
 
 - [ ] Live mode: connect to stdio/SSE servers and scan actual tool descriptions/schemas
 - [ ] Allowlist/baseline file so CI only fails on *new* findings
 - [ ] `pip`/`brew` distribution
-- [ ] More rules: OAuth scope over-grants, known-malicious package registry lookups
+- [ ] Vulnerability scanning for Docker images themselves (not just npm/PyPI packages)
 
 ## License
 

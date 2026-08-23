@@ -37,6 +37,18 @@ def build_parser() -> argparse.ArgumentParser:
              "(useful in CI, e.g. --fail-on HIGH).",
     )
     scan_p.add_argument("--quiet", "-q", action="store_true", help="Suppress terminal report output.")
+    scan_p.add_argument(
+        "--check-cve", action="store_true",
+        help="Cross-reference server packages against known vulnerabilities via osv.dev. "
+             "The only flag that makes a network call; off by default.",
+    )
+
+    serve_p = sub.add_parser("serve", help="Launch a local web UI for scanning MCP configs")
+    serve_p.add_argument("--host", default="127.0.0.1", help="Host to bind to (default: 127.0.0.1).")
+    serve_p.add_argument("--port", type=int, default=8765, help="Port to bind to (default: 8765).")
+    serve_p.add_argument(
+        "--no-browser", action="store_true", help="Don't automatically open a browser tab.",
+    )
 
     return parser
 
@@ -48,7 +60,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.cmd == "scan":
         try:
-            result = scanner.scan(paths=args.config, project_dir=args.project_dir)
+            result = scanner.scan(
+                paths=args.config, project_dir=args.project_dir, check_cve=args.check_cve,
+            )
         except ValueError as exc:
             console.print(f"[bold red]Error:[/bold red] {exc}")
             return 2
@@ -68,6 +82,29 @@ def main(argv: list[str] | None = None) -> int:
             threshold = Severity[args.fail_on]
             if any(f.severity >= threshold for f in result.findings):
                 return 1
+        return 0
+
+    if args.cmd == "serve":
+        try:
+            import uvicorn
+
+            from .web import create_app
+        except ImportError:
+            console.print(
+                "[bold red]Error:[/bold red] the web UI needs extra dependencies. "
+                "Install with: [bold]pip install -e '.[web]'[/bold]"
+            )
+            return 2
+
+        import threading
+        import webbrowser
+
+        url = f"http://{args.host}:{args.port}"
+        if not args.no_browser:
+            threading.Timer(1.0, lambda: webbrowser.open(url)).start()
+
+        console.print(f"[cyan]mcp-sentinel web UI running at {url} (Ctrl+C to stop)[/cyan]")
+        uvicorn.run(create_app(), host=args.host, port=args.port, log_level="warning")
         return 0
 
     return 1

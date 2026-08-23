@@ -76,8 +76,8 @@ def print_terminal_report(result: ScanResult, console: Console | None = None) ->
     ))
 
 
-def to_json(result: ScanResult) -> str:
-    payload = {
+def to_dict(result: ScanResult) -> dict:
+    return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "servers_scanned": result.servers_scanned,
         "files_scanned": [str(p) for p in result.files_scanned],
@@ -96,7 +96,10 @@ def to_json(result: ScanResult) -> str:
             for f in result.findings
         ],
     }
-    return json.dumps(payload, indent=2)
+
+
+def to_json(result: ScanResult) -> str:
+    return json.dumps(to_dict(result), indent=2)
 
 
 _HTML_TEMPLATE = """<!doctype html>

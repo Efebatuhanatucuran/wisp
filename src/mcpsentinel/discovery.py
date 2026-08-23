@@ -54,8 +54,23 @@ def parse_config_file(path: Path) -> list[ServerEntry]:
     Supports the two shapes in the wild: {"mcpServers": {...}} (Claude
     Desktop, Cursor, most clients) and {"servers": {...}} (VS Code)."""
     try:
-        data = json.loads(path.read_text())
-    except (OSError, json.JSONDecodeError) as exc:
+        text = path.read_text()
+    except OSError as exc:
+        raise ValueError(f"could not read {path}: {exc}") from exc
+    return _parse_config_text(text, path)
+
+
+def parse_config_text(text: str, source_name: str) -> list[ServerEntry]:
+    """Parse MCP config JSON already in memory (e.g. an uploaded/dropped
+    file) into normalized ServerEntry objects. ``source_name`` is used only
+    for format inference and as a display label — it need not exist on disk."""
+    return _parse_config_text(text, Path(source_name))
+
+
+def _parse_config_text(text: str, path: Path) -> list[ServerEntry]:
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError as exc:
         raise ValueError(f"could not parse {path}: {exc}") from exc
 
     servers_block = data.get("mcpServers") or data.get("servers") or {}
