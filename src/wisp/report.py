@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import html
 import json
 from datetime import datetime, timezone
 from pathlib import Path
 
 from rich.console import Console
+from rich.markup import escape as rich_escape
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
@@ -49,7 +51,7 @@ def print_terminal_report(result: ScanResult, console: Console | None = None) ->
     console.print(Panel(
         f"[bold]{result.servers_scanned}[/bold] server(s) across "
         f"[bold]{len(result.files_scanned)}[/bold] config file(s)\n"
-        + "\n".join(f"  • {mask_home_path(p)}" for p in result.files_scanned),
+        + "\n".join(f"  • {rich_escape(mask_home_path(p))}" for p in result.files_scanned),
         title="Wisp scan", border_style="cyan",
     ))
 
@@ -63,19 +65,19 @@ def print_terminal_report(result: ScanResult, console: Console | None = None) ->
         for f in result.findings:
             table.add_row(
                 Text(f.severity.label, style=f.severity.color),
-                f.rule_id,
-                f.server_name,
-                f.title,
+                Text(f.rule_id),
+                Text(f.server_name),
+                Text(f.title),
             )
         console.print(table)
 
         for f in result.findings:
             console.print(Panel(
-                f"[bold]{f.description}[/bold]\n\n"
-                f"[dim]Evidence:[/dim] {f.evidence or '—'}\n"
-                f"[dim]Fix:[/dim] {f.remediation or '—'}",
-                title=f"[{f.severity.color}]{f.severity.label}[/] {f.rule_id} · "
-                      f"{f.server_name} · {f.title}",
+                f"[bold]{rich_escape(f.description)}[/bold]\n\n"
+                f"[dim]Evidence:[/dim] {rich_escape(f.evidence) if f.evidence else '—'}\n"
+                f"[dim]Fix:[/dim] {rich_escape(f.remediation) if f.remediation else '—'}",
+                title=f"[{f.severity.color}]{f.severity.label}[/] {rich_escape(f.rule_id)} · "
+                      f"{rich_escape(f.server_name)} · {rich_escape(f.title)}",
                 border_style=f.severity.color.replace("bold ", ""),
             ))
     else:
@@ -163,10 +165,11 @@ def to_html(result: ScanResult) -> str:
             body_parts.append(
                 f'<div class="finding {f.severity.label}">'
                 f'<span class="badge {f.severity.label}">{f.severity.label}</span>'
-                f'<strong>{f.rule_id} &middot; {f.server_name} &middot; {f.title}</strong>'
-                f'<p>{f.description}</p>'
-                f'<div class="evidence">{f.evidence or "&mdash;"}</div>'
-                f'<p><em>Fix:</em> {f.remediation or "&mdash;"}</p>'
+                f'<strong>{html.escape(f.rule_id)} &middot; {html.escape(f.server_name)} &middot; '
+                f'{html.escape(f.title)}</strong>'
+                f'<p>{html.escape(f.description)}</p>'
+                f'<div class="evidence">{html.escape(f.evidence) if f.evidence else "&mdash;"}</div>'
+                f'<p><em>Fix:</em> {html.escape(f.remediation) if f.remediation else "&mdash;"}</p>'
                 f'</div>'
             )
         body = "\n".join(body_parts)
