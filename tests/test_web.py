@@ -98,6 +98,19 @@ def test_scan_report_html_download(client):
     assert "attachment" in res.headers["content-disposition"]
 
 
+def test_scan_report_sarif_download(client):
+    content = json.dumps({"mcpServers": {"shell": {"command": "bash"}}})
+    res = client.post("/api/scan/report.sarif", json={
+        "files": [{"name": "x.json", "content": content}], "check_cve": False,
+    })
+    assert res.status_code == 200
+    assert res.headers["content-type"].startswith("application/sarif+json")
+    assert "attachment" in res.headers["content-disposition"]
+    body = res.json()
+    assert body["version"] == "2.1.0"
+    assert body["runs"][0]["results"][0]["ruleId"] == "R001"
+
+
 def test_cve_feed_endpoint(client, monkeypatch):
     monkeypatch.setattr(
         cve_module, "fetch_mcp_cve_feed_cached",

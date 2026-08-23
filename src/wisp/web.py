@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -89,6 +89,15 @@ def create_app() -> FastAPI:
         return HTMLResponse(
             content=html,
             headers={"Content-Disposition": 'attachment; filename="wisp-report.html"'},
+        )
+
+    @app.post("/api/scan/report.sarif")
+    def api_scan_report_sarif(req: ScanRequest) -> Response:
+        sarif = report.to_sarif_json(_run_scan(req))
+        return Response(
+            content=sarif,
+            media_type="application/sarif+json",
+            headers={"Content-Disposition": 'attachment; filename="wisp-report.sarif"'},
         )
 
     @app.get("/api/cve-feed")

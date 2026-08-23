@@ -58,8 +58,9 @@ wisp scan
 # Scan a specific file:
 wisp scan --config path/to/mcp.json
 
-# Write JSON/HTML reports (HTML is a shareable one-pager):
-wisp scan --json report.json --html report.html
+# Write JSON/HTML/SARIF reports (HTML is a shareable one-pager; SARIF plugs
+# into GitHub Code Scanning and other SARIF-consuming tools):
+wisp scan --json report.json --html report.html --sarif report.sarif
 
 # Also cross-reference server packages against known CVEs via osv.dev
 # (the only flag that makes a network call; off by default):
@@ -86,7 +87,7 @@ wisp serve
 Opens a local dashboard (default `http://127.0.0.1:8765`) for scanning interactively instead of
 via the terminal: pick from auto-discovered configs, drag & drop a file, or load the bundled
 risky/safe/all-severities examples; findings are grouped by server with severity filters, and
-reports can be downloaded as JSON or HTML. Wisp — the little glowing mascot up top — sits next to
+reports can be downloaded as JSON, HTML, or SARIF. Wisp — the little glowing mascot up top — sits next to
 the header and changes color with your risk score once you scan. A few things the web UI does
 that the CLI doesn't:
 
@@ -108,6 +109,18 @@ from other machines), which is the safe setting — `/api/scan` will read and re
 on disk it's pointed at, by design, so it can scan a config anywhere on your machine. Don't pass
 `--host 0.0.0.0` (or otherwise expose the port) without putting your own auth in front of it, e.g.
 an SSH tunnel or VPN.
+
+## CI / GitHub Code Scanning
+
+`--sarif` output plugs directly into GitHub's Security tab:
+
+```yaml
+- run: pip install -e .
+- run: wisp scan --sarif wisp.sarif || true   # don't fail the step; let the next one gate on severity
+- uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: wisp.sarif
+```
 
 ## Why config-only (no live connection) by default?
 

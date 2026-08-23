@@ -59,8 +59,9 @@ wisp scan
 # Belirli bir dosyayı tara:
 wisp scan --config path/to/mcp.json
 
-# JSON/HTML rapor yaz (HTML paylaşılabilir tek sayfalık bir rapor):
-wisp scan --json report.json --html report.html
+# JSON/HTML/SARIF rapor yaz (HTML paylaşılabilir tek sayfalık bir rapor;
+# SARIF, GitHub Code Scanning ve benzeri araçlara doğrudan bağlanır):
+wisp scan --json report.json --html report.html --sarif report.sarif
 
 # Sunucu paketlerini osv.dev üzerinden bilinen CVE'lerle de karşılaştır
 # (ağa çıkan tek flag; varsayılan olarak kapalı):
@@ -88,7 +89,7 @@ wisp serve
 Terminal yerine etkileşimli tarama yapabileceğin lokal bir panel açar (varsayılan
 `http://127.0.0.1:8765`): otomatik bulunan config'lerden seç, bir dosyayı sürükle-bırak, ya da
 hazır riskli/güvenli/tüm-seviyeler örneklerini yükle; bulgular sunucuya göre gruplanır, severity'e
-göre filtrelenir, raporlar JSON/HTML olarak indirilebilir. Yukarıdaki minik parlayan maskot Wisp —
+göre filtrelenir, raporlar JSON/HTML/SARIF olarak indirilebilir. Yukarıdaki minik parlayan maskot Wisp —
 başlığın yanında duruyor ve taramadan sonra risk skoruna göre renk değiştiriyor. Web arayüzünün
 CLI'de olmayan birkaç özelliği:
 
@@ -111,6 +112,18 @@ CLI'de olmayan birkaç özelliği:
 dosyayı okuyup geri yansıtır (herhangi bir yerdeki config'i tarayabilmen için tasarlandı bu şekilde).
 Kendi kimlik doğrulamanı önüne koymadan (ör. SSH tüneli ya da VPN ile) `--host 0.0.0.0` verme ya da
 portu başka şekilde dışarı açma.
+
+## CI / GitHub Code Scanning
+
+`--sarif` çıktısı GitHub'ın Security sekmesine doğrudan bağlanır:
+
+```yaml
+- run: pip install -e .
+- run: wisp scan --sarif wisp.sarif || true   # bu adımı başarısız yapma; severity'e göre bir sonraki adımda karar ver
+- uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: wisp.sarif
+```
 
 ## Neden varsayılan olarak sadece config (canlı bağlantı yok)?
 

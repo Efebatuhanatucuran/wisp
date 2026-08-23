@@ -32,6 +32,10 @@ def build_parser() -> argparse.ArgumentParser:
     scan_p.add_argument("--json", type=Path, default=None, help="Write JSON report to this path.")
     scan_p.add_argument("--html", type=Path, default=None, help="Write HTML report to this path.")
     scan_p.add_argument(
+        "--sarif", type=Path, default=None,
+        help="Write a SARIF 2.1.0 report to this path (for GitHub Code Scanning and similar).",
+    )
+    scan_p.add_argument(
         "--fail-on", choices=[s.name for s in Severity], default=None,
         help="Exit non-zero if any finding meets or exceeds this severity "
              "(useful in CI, e.g. --fail-on HIGH).",
@@ -81,6 +85,10 @@ def main(argv: list[str] | None = None) -> int:
         if args.html:
             report.write_html(result, args.html)
             console.print(f"[dim]HTML report written to {args.html}[/dim]")
+
+        if args.sarif:
+            report.write_sarif(result, args.sarif)
+            console.print(f"[dim]SARIF report written to {args.sarif}[/dim]")
 
         if args.fail_on:
             threshold = Severity[args.fail_on]

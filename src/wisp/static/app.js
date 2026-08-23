@@ -33,6 +33,7 @@ const I18N = {
     scanBtn: "Scan",
     downloadJsonBtn: "Download JSON",
     downloadHtmlBtn: "Download HTML",
+    downloadSarifBtn: "Download SARIF",
     findingsHeading: "Findings",
     resultsEmpty: "Select config files on the left and click Scan.",
     cveFeedHeading: "MCP CVE feed",
@@ -55,6 +56,7 @@ const I18N = {
     noFindingsFiltered: "No findings match the active filters.",
     fixLabel: "Fix:",
     reportHtmlError: "Could not generate HTML report",
+    reportSarifError: "Could not generate SARIF report",
     justNow: "just now",
     unknownTime: "unknown",
     minAgo: (n) => `${n}m ago`,
@@ -88,6 +90,7 @@ const I18N = {
     scanBtn: "Tara",
     downloadJsonBtn: "JSON indir",
     downloadHtmlBtn: "HTML indir",
+    downloadSarifBtn: "SARIF indir",
     findingsHeading: "Bulgular",
     resultsEmpty: "Soldan config dosyalarını seç ve Tara'ya bas.",
     cveFeedHeading: "MCP CVE akışı",
@@ -110,6 +113,7 @@ const I18N = {
     noFindingsFiltered: "Aktif filtrelere uyan bulgu yok.",
     fixLabel: "Çözüm:",
     reportHtmlError: "HTML rapor oluşturulamadı",
+    reportSarifError: "SARIF rapor oluşturulamadı",
     justNow: "az önce",
     unknownTime: "bilinmiyor",
     minAgo: (n) => `${n} dk önce`,
@@ -149,6 +153,7 @@ const el = {
   downloadActions: document.getElementById("download-actions"),
   downloadJsonBtn: document.getElementById("download-json-btn"),
   downloadHtmlBtn: document.getElementById("download-html-btn"),
+  downloadSarifBtn: document.getElementById("download-sarif-btn"),
   summary: document.getElementById("summary"),
   errorBanner: document.getElementById("error-banner"),
   scoreBadge: document.getElementById("score-badge"),
@@ -565,6 +570,27 @@ el.downloadHtmlBtn.addEventListener("click", async () => {
     downloadBlob(html, "wisp-report.html", "text/html");
   } catch (err) {
     showError(`${t("reportHtmlError")}: ${err.message}`);
+  }
+});
+
+el.downloadSarifBtn.addEventListener("click", async () => {
+  if (!state.lastResult) return;
+  const { paths, files } = selectedForScan();
+  try {
+    const res = await fetch("/api/scan/report.sarif", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        paths: paths.length ? paths : null,
+        files: files.length ? files : null,
+        check_cve: el.checkCveInput.checked,
+      }),
+    });
+    if (!res.ok) throw new Error(`report failed: ${res.status}`);
+    const sarif = await res.text();
+    downloadBlob(sarif, "wisp-report.sarif", "application/sarif+json");
+  } catch (err) {
+    showError(`${t("reportSarifError")}: ${err.message}`);
   }
 });
 

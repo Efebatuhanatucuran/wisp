@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 from datetime import datetime, timezone
@@ -11,6 +12,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from . import __version__
 from .models import ScanResult, Severity
 
 
@@ -187,3 +189,78 @@ def to_html(result: ScanResult) -> str:
 
 def write_html(result: ScanResult, path: Path) -> None:
     path.write_text(to_html(result))
+
+
+_SARIF_LEVEL = {
+    Severity.CRITICAL: "error",
+    Severity.HIGH: "error",
+    Severity.MEDIUM: "warning",
+    Severity.LOW: "note",
+    Severity.INFO: "note",
+}
+
+_SARIF_SCHEMA = "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json"
+
+
+def to_sarif(result: ScanResult) -> dict:
+    """SARIF 2.1.0 output, for feeding into GitHub Code Scanning or any other
+    SARIF-consuming pipeline. Rule metadata is derived from the findings
+    themselves (title/severity), not a separately maintained catalog, so it
+    can't drift out of sync with what rules.py actually reports."""
+    rules_seen: dict[str, dict] = {}
+    sarif_results = []
+
+    for f in result.findings:
+        if f.rule_id not in rules_seen:
+            rules_seen[f.rule_id] = {
+                "id": f.rule_id,
+                "shortDescription": {"text": f.title},
+                "defaultConfiguration": {"level": _SARIF_LEVEL[f.severity]},
+            }
+
+        location_uri = mask_home_path(f.source_file)
+        fingerprint = hashlib.sha256(
+            f"{f.rule_id}:{f.server_name}:{f.source_file}".encode()
+        ).hexdigest()[:16]
+        message = f.description
+        if f.remediation:
+            message += f"\n\nFix: {f.remediation}"
+
+        sarif_results.append({
+            "ruleId": f.rule_id,
+            "level": _SARIF_LEVEL[f.severity],
+            "message": {"text": message},
+            "locations": [{
+                "physicalLocation": {"artifactLocation": {"uri": location_uri}},
+            }],
+            "partialFingerprints": {"wispFindingId/v1": fingerprint},
+            "properties": {
+                "severity": f.severity.label,
+                "server_name": f.server_name,
+                "evidence": f.evidence,
+            },
+        })
+
+    return {
+        "$schema": _SARIF_SCHEMA,
+        "version": "2.1.0",
+        "runs": [{
+            "tool": {
+                "driver": {
+                    "name": "Wisp",
+                    "informationUri": "https://github.com/Efebatuhanatucuran/wisp",
+                    "version": __version__,
+                    "rules": list(rules_seen.values()),
+                },
+            },
+            "results": sarif_results,
+        }],
+    }
+
+
+def to_sarif_json(result: ScanResult) -> str:
+    return json.dumps(to_sarif(result), indent=2)
+
+
+def write_sarif(result: ScanResult, path: Path) -> None:
+    path.write_text(to_sarif_json(result))
