@@ -39,7 +39,9 @@ def test_discover_returns_files(client, monkeypatch):
     monkeypatch.setattr(discovery, "discover_config_files", lambda project_dir=None: [Path("/tmp/x.json")])
     res = client.get("/api/discover")
     assert res.status_code == 200
-    assert res.json() == {"files": ["/tmp/x.json"]}
+    body = res.json()
+    assert body["files"] == ["/tmp/x.json"]
+    assert body["home"]  # non-empty; used by the frontend to mask the username in display
 
 
 def test_example_risky_returns_content(client):

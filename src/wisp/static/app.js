@@ -8,7 +8,135 @@ const state = {
   items: [],
   lastResult: null,
   activeFilters: new Set(SEVERITIES),
+  home: null,
+  lang: "en",
 };
+
+const I18N = {
+  en: {
+    pageTitle: "Wisp — MCP config scanner",
+    tagline: "static security scanner for MCP server configs",
+    scoreLabel: "risk score",
+    configFilesHeading: "Config files",
+    loading: "Loading…",
+    refreshing: "Refreshing…",
+    dropZoneText: "Drag & drop a config file here",
+    chooseFile: "Choose file…",
+    tryExample: "Try an example:",
+    exampleRisky: "risky config",
+    exampleSafe: "safe config",
+    exampleDemo: "all severities",
+    addPathPlaceholder: "or type a path: /path/to/mcp.json",
+    addBtn: "Add",
+    checkCveLabel: "Check known CVEs (queries osv.dev)",
+    rediscoverBtn: "Rediscover",
+    scanBtn: "Scan",
+    downloadJsonBtn: "Download JSON",
+    downloadHtmlBtn: "Download HTML",
+    findingsHeading: "Findings",
+    resultsEmpty: "Select config files on the left and click Scan.",
+    cveFeedHeading: "MCP CVE feed",
+    refreshBtn: "Refresh",
+    cveFeedLoading: "Loading recent MCP-related CVEs…",
+    noConfigFiles: "No config files yet. Drop one below, load an example, or add a path.",
+    tagKnown: "known",
+    tagManual: "manual",
+    tagUploaded: "uploaded",
+    tagExample: "example",
+    removeTitle: "Remove",
+    discoverError: "Could not discover config files",
+    readFileError: "Could not read",
+    loadExampleError: "Could not load example",
+    selectAtLeastOne: "Select at least one config file, drop one in, or add a path.",
+    scanning: "Scanning…",
+    scanFailed: "Scan failed",
+    scanFailedSeeError: "Scan failed. See error above.",
+    noFindings: "No findings. Configured servers look clean against current rules.",
+    noFindingsFiltered: "No findings match the active filters.",
+    fixLabel: "Fix:",
+    reportHtmlError: "Could not generate HTML report",
+    justNow: "just now",
+    unknownTime: "unknown",
+    minAgo: (n) => `${n}m ago`,
+    hourAgo: (n) => `${n}h ago`,
+    dayAgo: (n) => `${n}d ago`,
+    cveFeedEmpty: "No published CVEs mention MCP yet — the protocol is still new. This list fills in as the ecosystem matures, and refreshes automatically.",
+    cveFeedCouldNotLoad: "Could not load feed",
+    cveFeedFailed: "Failed to load CVE feed",
+    metaLine: (source, ago) => `${source} · updated ${ago}`,
+    summaryLine: (servers, files, findings) =>
+      `<strong>${servers}</strong> server(s) across <strong>${files}</strong> file(s) &middot; <strong>${findings}</strong> finding(s)`,
+    findingsCount: (n) => `${n} finding${n > 1 ? "s" : ""}`,
+  },
+  tr: {
+    pageTitle: "Wisp — MCP config tarayıcı",
+    tagline: "MCP sunucu konfigürasyonları için statik güvenlik tarayıcısı",
+    scoreLabel: "risk skoru",
+    configFilesHeading: "Config dosyaları",
+    loading: "Yükleniyor…",
+    refreshing: "Yenileniyor…",
+    dropZoneText: "Bir config dosyasını buraya sürükle-bırak",
+    chooseFile: "Dosya seç…",
+    tryExample: "Bir örnek dene:",
+    exampleRisky: "riskli config",
+    exampleSafe: "güvenli config",
+    exampleDemo: "tüm seviyeler",
+    addPathPlaceholder: "veya bir yol yaz: /path/to/mcp.json",
+    addBtn: "Ekle",
+    checkCveLabel: "Bilinen CVE'leri kontrol et (osv.dev'e sorar)",
+    rediscoverBtn: "Yeniden bul",
+    scanBtn: "Tara",
+    downloadJsonBtn: "JSON indir",
+    downloadHtmlBtn: "HTML indir",
+    findingsHeading: "Bulgular",
+    resultsEmpty: "Soldan config dosyalarını seç ve Tara'ya bas.",
+    cveFeedHeading: "MCP CVE akışı",
+    refreshBtn: "Yenile",
+    cveFeedLoading: "Güncel MCP ile ilgili CVE'ler yükleniyor…",
+    noConfigFiles: "Henüz config dosyası yok. Aşağıya bir tane bırak, örnek yükle, ya da bir yol ekle.",
+    tagKnown: "bilinen",
+    tagManual: "manuel",
+    tagUploaded: "yüklendi",
+    tagExample: "örnek",
+    removeTitle: "Kaldır",
+    discoverError: "Config dosyaları bulunamadı",
+    readFileError: "Okunamadı",
+    loadExampleError: "Örnek yüklenemedi",
+    selectAtLeastOne: "En az bir config dosyası seç, bir tane bırak, ya da bir yol ekle.",
+    scanning: "Taranıyor…",
+    scanFailed: "Tarama başarısız",
+    scanFailedSeeError: "Tarama başarısız oldu. Yukarıdaki hataya bak.",
+    noFindings: "Bulgu yok. Yapılandırılmış sunucular mevcut kurallara göre temiz görünüyor.",
+    noFindingsFiltered: "Aktif filtrelere uyan bulgu yok.",
+    fixLabel: "Çözüm:",
+    reportHtmlError: "HTML rapor oluşturulamadı",
+    justNow: "az önce",
+    unknownTime: "bilinmiyor",
+    minAgo: (n) => `${n} dk önce`,
+    hourAgo: (n) => `${n} sa önce`,
+    dayAgo: (n) => `${n} gün önce`,
+    cveFeedEmpty: "MCP ile ilgili yayınlanmış bir CVE henüz yok — protokol çok yeni. Ekosistem büyüdükçe bu liste dolacak ve otomatik güncellenecek.",
+    cveFeedCouldNotLoad: "Akış yüklenemedi",
+    cveFeedFailed: "CVE akışı yüklenemedi",
+    metaLine: (source, ago) => `${source} · ${ago} güncellendi`,
+    summaryLine: (servers, files, findings) =>
+      `<strong>${servers}</strong> sunucu, <strong>${files}</strong> dosya tarandı &middot; <strong>${findings}</strong> bulgu`,
+    findingsCount: (n) => `${n} bulgu`,
+  },
+};
+
+function t(key) {
+  const val = (I18N[state.lang] && I18N[state.lang][key]) ?? I18N.en[key];
+  return val;
+}
+
+const TAG_KEY = { discovered: "tagKnown", custom: "tagManual", upload: "tagUploaded", example: "tagExample" };
+
+function maskHome(path, home) {
+  if (!home || typeof path !== "string" || !path.startsWith(home)) return path;
+  const parent = home.slice(0, home.lastIndexOf("/") + 1) || home.slice(0, home.lastIndexOf("\\") + 1);
+  return `${parent}****${path.slice(home.length)}`;
+}
 
 const el = {
   fileList: document.getElementById("file-list"),
@@ -31,7 +159,25 @@ const el = {
   cveFeedMeta: document.getElementById("cve-feed-meta"),
   cveFeedList: document.getElementById("cve-feed-list"),
   cveFeedRefreshBtn: document.getElementById("cve-feed-refresh-btn"),
+  pageTitle: document.getElementById("page-title"),
 };
+
+function applyStaticTranslations() {
+  document.querySelectorAll("[data-i18n]").forEach((elm) => {
+    const val = t(elm.dataset.i18n);
+    if (typeof val === "string") elm.textContent = val;
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((elm) => {
+    const val = t(elm.dataset.i18nPlaceholder);
+    if (typeof val === "string") elm.placeholder = val;
+  });
+  document.documentElement.lang = state.lang;
+  el.pageTitle.textContent = t("pageTitle");
+  document.querySelectorAll(".lang-btn").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.lang === state.lang);
+  });
+  if (!el.scanBtn.disabled) el.scanBtn.textContent = t("scanBtn");
+}
 
 function showError(message) {
   if (!message) {
@@ -44,22 +190,22 @@ function showError(message) {
 }
 
 function loadPersisted() {
+  let savedLang = null;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
-    const data = JSON.parse(raw);
-    (data.customPaths || []).forEach((path) => {
-      state.items.push({ id: nextId++, kind: "custom", label: path, path, checked: true });
-    });
-    if (data.lastResult) {
-      state.lastResult = data.lastResult;
-    }
-    if (typeof data.checkCve === "boolean") {
-      el.checkCveInput.checked = data.checkCve;
+    if (raw) {
+      const data = JSON.parse(raw);
+      (data.customPaths || []).forEach((path) => {
+        state.items.push({ id: nextId++, kind: "custom", label: path, path, checked: true });
+      });
+      if (data.lastResult) state.lastResult = data.lastResult;
+      if (typeof data.checkCve === "boolean") el.checkCveInput.checked = data.checkCve;
+      if (data.lang) savedLang = data.lang;
     }
   } catch (err) {
     /* corrupted/unavailable storage: ignore, start fresh */
   }
+  state.lang = savedLang || (navigator.language && navigator.language.toLowerCase().startsWith("tr") ? "tr" : "en");
 }
 
 function savePersisted() {
@@ -69,17 +215,16 @@ function savePersisted() {
       customPaths,
       lastResult: state.lastResult,
       checkCve: el.checkCveInput.checked,
+      lang: state.lang,
     }));
   } catch (err) {
     /* storage unavailable (private mode, quota, etc): non-fatal */
   }
 }
 
-const TAG_LABEL = { discovered: "known", custom: "manual", upload: "uploaded", example: "example" };
-
 function renderFileList() {
   if (state.items.length === 0) {
-    el.fileList.innerHTML = '<p class="muted">No config files yet. Drop one below, load an example, or add a path.</p>';
+    el.fileList.innerHTML = `<p class="muted">${t("noConfigFiles")}</p>`;
     return;
   }
   el.fileList.innerHTML = "";
@@ -93,12 +238,13 @@ function renderFileList() {
     checkbox.addEventListener("change", () => { item.checked = checkbox.checked; });
 
     const label = document.createElement("label");
-    label.textContent = item.label;
-    label.title = item.label;
+    const displayLabel = maskHome(item.label, state.home);
+    label.textContent = displayLabel;
+    label.title = displayLabel;
 
     const tag = document.createElement("span");
     tag.className = "tag";
-    tag.textContent = TAG_LABEL[item.kind];
+    tag.textContent = t(TAG_KEY[item.kind]);
 
     row.appendChild(checkbox);
     row.appendChild(label);
@@ -108,7 +254,7 @@ function renderFileList() {
       const removeBtn = document.createElement("button");
       removeBtn.className = "remove-btn";
       removeBtn.textContent = "✕";
-      removeBtn.title = "Remove";
+      removeBtn.title = t("removeTitle");
       removeBtn.addEventListener("click", () => {
         state.items = state.items.filter((i) => i.id !== item.id);
         renderFileList();
@@ -126,12 +272,14 @@ async function discover() {
     const res = await fetch("/api/discover");
     if (!res.ok) throw new Error(`discover failed: ${res.status}`);
     const data = await res.json();
+    state.home = data.home || null;
     state.items = state.items.filter((i) => i.kind !== "discovered");
     const discovered = data.files.map((path) => ({ id: nextId++, kind: "discovered", label: path, path, checked: true }));
     state.items = [...discovered, ...state.items];
     renderFileList();
+    if (state.lastResult) renderFindings(); // re-render with the now-known home path masked
   } catch (err) {
-    showError(`Could not discover config files: ${err.message}`);
+    showError(`${t("discoverError")}: ${err.message}`);
   }
 }
 
@@ -147,7 +295,7 @@ async function addFiles(fileList) {
       const content = await file.text();
       state.items.push({ id: nextId++, kind: "upload", label: file.name, content, checked: true });
     } catch (err) {
-      showError(`Could not read ${file.name}: ${err.message}`);
+      showError(`${t("readFileError")} ${file.name}: ${err.message}`);
     }
   }
   renderFileList();
@@ -164,7 +312,7 @@ async function loadExample(name) {
     state.items.push({ id: nextId++, kind: "example", label, content: data.content, checked: true });
     renderFileList();
   } catch (err) {
-    showError(`Could not load example: ${err.message}`);
+    showError(`${t("loadExampleError")}: ${err.message}`);
   }
 }
 
@@ -231,10 +379,10 @@ function findingHtml(f) {
         <span class="badge ${f.severity}">${f.severity}</span>
         <strong>${escapeHtml(f.rule_id)} &middot; ${escapeHtml(f.title)}</strong>
       </div>
-      <div class="finding-meta">${escapeHtml(f.source_file)}</div>
+      <div class="finding-meta">${escapeHtml(maskHome(f.source_file, state.home))}</div>
       <p>${escapeHtml(f.description)}</p>
       ${f.evidence ? `<div class="evidence">${escapeHtml(f.evidence)}</div>` : ""}
-      ${f.remediation ? `<p class="remediation"><em>Fix:</em> ${escapeHtml(f.remediation)}</p>` : ""}
+      ${f.remediation ? `<p class="remediation"><em>${t("fixLabel")}</em> ${escapeHtml(f.remediation)}</p>` : ""}
     </div>
   `;
 }
@@ -245,11 +393,11 @@ function renderFindings() {
   const filtered = all.filter((f) => state.activeFilters.has(f.severity));
 
   if (all.length === 0) {
-    el.results.innerHTML = '<p class="muted">No findings. Configured servers look clean against current rules.</p>';
+    el.results.innerHTML = `<p class="muted">${t("noFindings")}</p>`;
     return;
   }
   if (filtered.length === 0) {
-    el.results.innerHTML = '<p class="muted">No findings match the active filters.</p>';
+    el.results.innerHTML = `<p class="muted">${t("noFindingsFiltered")}</p>`;
     return;
   }
 
@@ -275,7 +423,7 @@ function renderFindings() {
         <summary>
           <span class="badge ${worst}">${worst}</span>
           <strong>${escapeHtml(server)}</strong>
-          <span class="muted">(${items.length} finding${items.length > 1 ? "s" : ""})</span>
+          <span class="muted">(${t("findingsCount")(items.length)})</span>
         </summary>
         <div class="server-findings">${items.map(findingHtml).join("")}</div>
       </details>
@@ -284,9 +432,9 @@ function renderFindings() {
 }
 
 function renderSummary(result) {
-  el.summary.innerHTML = `<strong>${result.servers_scanned}</strong> server(s) across
-    <strong>${result.files_scanned.length}</strong> file(s) &middot;
-    <strong>${result.findings.length}</strong> finding(s)`;
+  el.summary.innerHTML = t("summaryLine")(
+    result.servers_scanned, result.files_scanned.length, result.findings.length,
+  );
 }
 
 function renderAll() {
@@ -315,13 +463,13 @@ async function runScan() {
   showError(null);
   const { paths, files } = selectedForScan();
   if (paths.length === 0 && files.length === 0) {
-    showError("Select at least one config file, drop one in, or add a path.");
+    showError(t("selectAtLeastOne"));
     return;
   }
 
   el.scanBtn.disabled = true;
-  el.scanBtn.innerHTML = '<span class="spinner"></span> Scanning…';
-  el.results.innerHTML = '<p class="muted">Scanning…</p>';
+  el.scanBtn.innerHTML = `<span class="spinner"></span> ${t("scanning")}`;
+  el.results.innerHTML = `<p class="muted">${t("scanning")}</p>`;
   el.wisp.classList.add("scanning");
 
   try {
@@ -342,11 +490,11 @@ async function runScan() {
     renderAll();
     savePersisted();
   } catch (err) {
-    showError(`Scan failed: ${err.message}`);
-    el.results.innerHTML = '<p class="muted">Scan failed. See error above.</p>';
+    showError(`${t("scanFailed")}: ${err.message}`);
+    el.results.innerHTML = `<p class="muted">${t("scanFailedSeeError")}</p>`;
   } finally {
     el.scanBtn.disabled = false;
-    el.scanBtn.textContent = "Scan";
+    el.scanBtn.textContent = t("scanBtn");
     el.wisp.classList.remove("scanning");
   }
 }
@@ -382,6 +530,18 @@ document.querySelectorAll(".link-btn[data-example]").forEach((btn) => {
   btn.addEventListener("click", () => loadExample(btn.dataset.example));
 });
 
+document.querySelectorAll(".lang-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (state.lang === btn.dataset.lang) return;
+    state.lang = btn.dataset.lang;
+    applyStaticTranslations();
+    renderFileList();
+    if (state.lastResult) renderAll();
+    loadCveFeed(false);
+    savePersisted();
+  });
+});
+
 el.downloadJsonBtn.addEventListener("click", () => {
   if (!state.lastResult) return;
   downloadBlob(JSON.stringify(state.lastResult, null, 2), "wisp-report.json", "application/json");
@@ -404,19 +564,19 @@ el.downloadHtmlBtn.addEventListener("click", async () => {
     const html = await res.text();
     downloadBlob(html, "wisp-report.html", "text/html");
   } catch (err) {
-    showError(`Could not generate HTML report: ${err.message}`);
+    showError(`${t("reportHtmlError")}: ${err.message}`);
   }
 });
 
 function timeAgo(isoString) {
   const then = new Date(isoString).getTime();
-  if (Number.isNaN(then)) return "unknown";
+  if (Number.isNaN(then)) return t("unknownTime");
   const diffMin = Math.round((Date.now() - then) / 60000);
-  if (diffMin < 1) return "just now";
-  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffMin < 1) return t("justNow");
+  if (diffMin < 60) return t("minAgo")(diffMin);
   const diffHr = Math.round(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
-  return `${Math.round(diffHr / 24)}d ago`;
+  if (diffHr < 24) return t("hourAgo")(diffHr);
+  return t("dayAgo")(Math.round(diffHr / 24));
 }
 
 function cveItemHtml(item) {
@@ -435,21 +595,22 @@ function cveItemHtml(item) {
 }
 
 async function loadCveFeed(refresh) {
-  el.cveFeedMeta.textContent = refresh ? "Refreshing…" : "Loading…";
+  el.cveFeedMeta.textContent = refresh ? t("refreshing") : t("loading");
   try {
-    const res = await fetch(`/api/cve-feed${refresh ? "?refresh=true" : ""}`);
+    const params = new URLSearchParams({ lang: state.lang });
+    if (refresh) params.set("refresh", "true");
+    const res = await fetch(`/api/cve-feed?${params.toString()}`);
     if (!res.ok) throw new Error(`feed failed: ${res.status}`);
     const data = await res.json();
-    el.cveFeedMeta.textContent = `${data.source} · updated ${timeAgo(data.fetched_at)}`;
+    el.cveFeedMeta.textContent = t("metaLine")(data.source, timeAgo(data.fetched_at));
     if (data.items.length === 0) {
-      el.cveFeedList.innerHTML =
-        '<p class="muted">No published CVEs mention MCP yet — the protocol is still new. This list fills in as the ecosystem matures, and refreshes automatically.</p>';
+      el.cveFeedList.innerHTML = `<p class="muted">${t("cveFeedEmpty")}</p>`;
       return;
     }
     el.cveFeedList.innerHTML = data.items.map(cveItemHtml).join("");
   } catch (err) {
-    el.cveFeedMeta.textContent = "Could not load feed";
-    el.cveFeedList.innerHTML = `<p class="muted">Failed to load CVE feed: ${escapeHtml(err.message)}</p>`;
+    el.cveFeedMeta.textContent = t("cveFeedCouldNotLoad");
+    el.cveFeedList.innerHTML = `<p class="muted">${t("cveFeedFailed")}: ${escapeHtml(err.message)}</p>`;
   }
 }
 
@@ -457,6 +618,7 @@ el.cveFeedRefreshBtn.addEventListener("click", () => loadCveFeed(true));
 el.checkCveInput.addEventListener("change", savePersisted);
 
 loadPersisted();
+applyStaticTranslations();
 renderFileList();
 if (state.lastResult) renderAll();
 discover();

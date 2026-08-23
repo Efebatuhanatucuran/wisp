@@ -58,7 +58,7 @@ def create_app() -> FastAPI:
     def api_discover(project_dir: str | None = None) -> dict:
         base = Path(project_dir) if project_dir else None
         files = discovery.discover_config_files(base)
-        return {"files": [str(p) for p in files]}
+        return {"files": [str(p) for p in files], "home": str(Path.home())}
 
     @app.get("/api/examples/{name}")
     def api_example(name: str) -> dict:
@@ -92,12 +92,20 @@ def create_app() -> FastAPI:
         )
 
     @app.get("/api/cve-feed")
-    def api_cve_feed(refresh: bool = False) -> dict:
+    def api_cve_feed(refresh: bool = False, lang: str = "en") -> dict:
         items, fetched_at = cve.fetch_mcp_cve_feed_cached(force=refresh)
+        if lang == "tr":
+            items = [
+                {**item, "summary": cve.translate_text(item["summary"], "tr")}
+                for item in items
+            ]
+            source = 'NVD anahtar kelime araması: "Model Context Protocol" (özetler makine çevirisi)'
+        else:
+            source = 'NVD keyword search: "Model Context Protocol"'
         return {
             "items": items,
             "fetched_at": datetime.fromtimestamp(fetched_at, tz=timezone.utc).isoformat(),
-            "source": 'NVD keyword search: "Model Context Protocol"',
+            "source": source,
         }
 
     @app.get("/")

@@ -43,6 +43,16 @@ header {
 
 .brand { display: flex; align-items: center; gap: 0.9rem; }
 header h1 { margin: 0; font-size: 1.3rem; }
+
+.header-right { display: flex; align-items: center; gap: 0.8rem; }
+
+.lang-toggle { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.lang-btn {
+  border: none; background: var(--bg); color: var(--muted); padding: 0.4rem 0.7rem;
+  font-size: 0.78rem; font-weight: 600; cursor: pointer; border-radius: 0;
+}
+.lang-btn:hover { color: var(--fg); }
+.lang-btn.active { background: var(--accent); color: white; }
 .tagline { margin: 0; color: var(--muted); font-size: 0.85rem; }
 
 /* --- Wisp mascot --- */

@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" id="html-root">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wisp &mdash; MCP config scanner</title>
+<title id="page-title">Wisp &mdash; MCP config scanner</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -22,55 +22,61 @@
     </div>
     <div>
       <h1>Wisp</h1>
-      <p class="tagline">static security scanner for MCP server configs</p>
+      <p class="tagline" data-i18n="tagline">static security scanner for MCP server configs</p>
     </div>
   </div>
-  <div id="score-badge" class="score-badge score-unknown">
-    <span class="score-value">&mdash;</span>
-    <span class="score-label">risk score</span>
+  <div class="header-right">
+    <div id="lang-toggle" class="lang-toggle">
+      <button type="button" class="lang-btn" data-lang="en">EN</button>
+      <button type="button" class="lang-btn" data-lang="tr">TR</button>
+    </div>
+    <div id="score-badge" class="score-badge score-unknown">
+      <span class="score-value">&mdash;</span>
+      <span class="score-label" data-i18n="scoreLabel">risk score</span>
+    </div>
   </div>
 </header>
 
 <main>
   <aside class="panel">
-    <h2>Config files</h2>
+    <h2 data-i18n="configFilesHeading">Config files</h2>
     <div id="file-list" class="file-list">
-      <p class="muted">Loading&hellip;</p>
+      <p class="muted" data-i18n="loading">Loading&hellip;</p>
     </div>
 
     <div id="drop-zone" class="drop-zone">
-      <p>Drag &amp; drop a config file here</p>
+      <p data-i18n="dropZoneText">Drag &amp; drop a config file here</p>
       <label class="file-picker-btn">
-        Choose file&hellip;
+        <span data-i18n="chooseFile">Choose file&hellip;</span>
         <input id="file-input" type="file" accept=".json,application/json" multiple hidden>
       </label>
     </div>
 
     <div class="example-row">
-      <span class="muted small">Try an example:</span>
-      <button type="button" class="link-btn" data-example="risky">risky config</button>
-      <button type="button" class="link-btn" data-example="safe">safe config</button>
-      <button type="button" class="link-btn" data-example="demo">all severities</button>
+      <span class="muted small" data-i18n="tryExample">Try an example:</span>
+      <button type="button" class="link-btn" data-example="risky" data-i18n="exampleRisky">risky config</button>
+      <button type="button" class="link-btn" data-example="safe" data-i18n="exampleSafe">safe config</button>
+      <button type="button" class="link-btn" data-example="demo" data-i18n="exampleDemo">all severities</button>
     </div>
 
     <form id="add-path-form" class="add-path-form">
-      <input id="add-path-input" type="text" placeholder="or type a path: /path/to/mcp.json" autocomplete="off">
-      <button type="submit">Add</button>
+      <input id="add-path-input" type="text" data-i18n-placeholder="addPathPlaceholder" placeholder="or type a path: /path/to/mcp.json" autocomplete="off">
+      <button type="submit" data-i18n="addBtn">Add</button>
     </form>
 
     <label class="check-cve-toggle">
       <input type="checkbox" id="check-cve-input" checked>
-      Check known CVEs (queries osv.dev)
+      <span data-i18n="checkCveLabel">Check known CVEs (queries osv.dev)</span>
     </label>
 
     <div class="actions">
-      <button id="rediscover-btn" type="button" class="secondary">Rediscover</button>
-      <button id="scan-btn" type="button" class="primary">Scan</button>
+      <button id="rediscover-btn" type="button" class="secondary" data-i18n="rediscoverBtn">Rediscover</button>
+      <button id="scan-btn" type="button" class="primary" data-i18n="scanBtn">Scan</button>
     </div>
 
     <div id="download-actions" class="download-actions" hidden>
-      <button id="download-json-btn" type="button" class="secondary small">Download JSON</button>
-      <button id="download-html-btn" type="button" class="secondary small">Download HTML</button>
+      <button id="download-json-btn" type="button" class="secondary small" data-i18n="downloadJsonBtn">Download JSON</button>
+      <button id="download-html-btn" type="button" class="secondary small" data-i18n="downloadHtmlBtn">Download HTML</button>
     </div>
 
     <div id="summary" class="summary"></div>
@@ -79,11 +85,11 @@
 
   <section class="panel results-panel">
     <div class="results-header">
-      <h2>Findings</h2>
+      <h2 data-i18n="findingsHeading">Findings</h2>
       <div id="severity-filters" class="severity-filters"></div>
     </div>
     <div id="results" class="results">
-      <p class="muted">Select config files on the left and click Scan.</p>
+      <p class="muted" data-i18n="resultsEmpty">Select config files on the left and click Scan.</p>
     </div>
   </section>
 </main>
@@ -91,13 +97,13 @@
 <section class="panel cve-feed-panel">
   <div class="results-header">
     <div>
-      <h2>MCP CVE feed</h2>
-      <p class="tagline" id="cve-feed-meta">Loading&hellip;</p>
+      <h2 data-i18n="cveFeedHeading">MCP CVE feed</h2>
+      <p class="tagline" id="cve-feed-meta" data-i18n="loading">Loading&hellip;</p>
     </div>
-    <button id="cve-feed-refresh-btn" type="button" class="secondary small">Refresh</button>
+    <button id="cve-feed-refresh-btn" type="button" class="secondary small" data-i18n="refreshBtn">Refresh</button>
   </div>
   <div id="cve-feed-list" class="cve-feed-list">
-    <p class="muted">Loading recent MCP-related CVEs&hellip;</p>
+    <p class="muted" data-i18n="cveFeedLoading">Loading recent MCP-related CVEs&hellip;</p>
   </div>
 </section>
 

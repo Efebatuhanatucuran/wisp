@@ -242,3 +242,36 @@ def fetch_mcp_cve_feed_cached(limit: int = 20, force: bool = False) -> tuple[lis
         _nvd_cache[key] = (items, now)
         return _nvd_cache[key]
     return cached
+
+
+# --- Machine translation for the CVE feed (display only) --------------------
+
+_MYMEMORY_URL = "https://api.mymemory.translated.net/get"
+_MYMEMORY_MAX_CHARS = 480  # free-tier per-request limit is ~500 bytes
+
+_translation_cache: dict[tuple[str, str], str] = {}
+
+
+def translate_text(text: str, target_lang: str = "tr", source_lang: str = "en") -> str:
+    """Best-effort machine translation via the free MyMemory API. Falls back
+    to the original text on any error, truncation, or empty input — this is
+    a display nicety, never something a caller should depend on being exact."""
+    if not text:
+        return text
+    key = (text, target_lang)
+    if key in _translation_cache:
+        return _translation_cache[key]
+
+    chunk = text[:_MYMEMORY_MAX_CHARS]
+    if len(chunk) < len(text):
+        last_space = chunk.rfind(" ")
+        if last_space > 0:
+            chunk = chunk[:last_space]
+        chunk += "…"
+
+    params = urllib.parse.urlencode({"q": chunk, "langpair": f"{source_lang}|{target_lang}"})
+    data = _get_json(f"{_MYMEMORY_URL}?{params}")
+    translated = (data or {}).get("responseData", {}).get("translatedText")
+    result = translated if translated else text
+    _translation_cache[key] = result
+    return result

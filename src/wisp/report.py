@@ -12,6 +12,19 @@ from rich.text import Text
 from .models import ScanResult, Severity
 
 
+def mask_home_path(path) -> str:
+    """Replace the current user's home directory with a masked placeholder
+    (e.g. /Users/****/...) so displayed/screenshotted paths don't reveal the
+    local username. Paths outside the home directory are left untouched."""
+    p = str(path)
+    home = Path.home()
+    home_str = str(home)
+    if p == home_str or p.startswith(home_str + "/") or p.startswith(home_str + "\\"):
+        masked_home = str(home.parent / "****")
+        return masked_home + p[len(home_str):]
+    return p
+
+
 def _score_color(score: int) -> str:
     if score >= 85:
         return "green"
@@ -36,7 +49,7 @@ def print_terminal_report(result: ScanResult, console: Console | None = None) ->
     console.print(Panel(
         f"[bold]{result.servers_scanned}[/bold] server(s) across "
         f"[bold]{len(result.files_scanned)}[/bold] config file(s)\n"
-        + "\n".join(f"  • {p}" for p in result.files_scanned),
+        + "\n".join(f"  • {mask_home_path(p)}" for p in result.files_scanned),
         title="Wisp scan", border_style="cyan",
     ))
 
