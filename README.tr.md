@@ -106,6 +106,12 @@ CLI'de olmayan birkaç özelliği:
   platform karşılığı) olarak gösteriliyor, böylece ekran görüntüleri kullanıcı adını sızdırmıyor.
   Ham JSON çıktısı bilerek maskelenmiyor, çünkü programatik kullanım için.
 
+**Güvenlik notu:** `wisp serve`'in kimlik doğrulaması yok. Varsayılan olarak `127.0.0.1`'e bağlanır
+(başka makinelerden erişilemez) — bu güvenli ayardır. `/api/scan`, bilerek verilen herhangi bir
+dosyayı okuyup geri yansıtır (herhangi bir yerdeki config'i tarayabilmen için tasarlandı bu şekilde).
+Kendi kimlik doğrulamanı önüne koymadan (ör. SSH tüneli ya da VPN ile) `--host 0.0.0.0` verme ya da
+portu başka şekilde dışarı açma.
+
 ## Neden varsayılan olarak sadece config (canlı bağlantı yok)?
 
 Çekirdek tarayıcı bilinçli olarak statik: MCP istemcinin sunucuya vereceği JSON'ı, hiç ağ çağrısı

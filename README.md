@@ -103,6 +103,12 @@ that the CLI doesn't:
   CLI terminal output — so screenshots don't leak your username. Raw JSON output is left unmasked
   since it's meant for programmatic use.
 
+**Security note:** `wisp serve` has no authentication. It defaults to `127.0.0.1` (not reachable
+from other machines), which is the safe setting — `/api/scan` will read and reflect back any file
+on disk it's pointed at, by design, so it can scan a config anywhere on your machine. Don't pass
+`--host 0.0.0.0` (or otherwise expose the port) without putting your own auth in front of it, e.g.
+an SSH tunnel or VPN.
+
 ## Why config-only (no live connection) by default?
 
 The core scanner is intentionally static: it parses the JSON your MCP client will hand a server,

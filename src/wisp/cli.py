@@ -44,7 +44,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     serve_p = sub.add_parser("serve", help="Launch a local web UI for scanning MCP configs")
-    serve_p.add_argument("--host", default="127.0.0.1", help="Host to bind to (default: 127.0.0.1).")
+    serve_p.add_argument(
+        "--host", default="127.0.0.1",
+        help="Host to bind to (default: 127.0.0.1). There is no authentication — "
+             "binding beyond localhost exposes unauthenticated local file reads to the network.",
+    )
     serve_p.add_argument("--port", type=int, default=8765, help="Port to bind to (default: 8765).")
     serve_p.add_argument(
         "--no-browser", action="store_true", help="Don't automatically open a browser tab.",
@@ -98,6 +102,14 @@ def main(argv: list[str] | None = None) -> int:
 
         import threading
         import webbrowser
+
+        if args.host not in ("127.0.0.1", "localhost", "::1"):
+            console.print(
+                f"[bold yellow]Warning:[/bold yellow] binding to {args.host} exposes Wisp to "
+                "anyone who can reach this host on the network. There is no authentication: "
+                "anyone with network access can read any file on this machine that /api/scan "
+                "can be pointed at. Prefer an SSH tunnel or VPN over exposing this directly."
+            )
 
         url = f"http://{args.host}:{args.port}"
         if not args.no_browser:
