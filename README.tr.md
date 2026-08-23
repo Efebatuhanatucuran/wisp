@@ -87,10 +87,10 @@ wisp serve
 
 Terminal yerine etkileşimli tarama yapabileceğin lokal bir panel açar (varsayılan
 `http://127.0.0.1:8765`): otomatik bulunan config'lerden seç, bir dosyayı sürükle-bırak, ya da
-hazır riskli/temiz örnekleri yükle; bulgular sunucuya göre gruplanır, severity'e göre filtrelenir,
-raporlar JSON/HTML olarak indirilebilir. Yukarıdaki minik parlayan maskot Wisp — başlığın yanında
-duruyor ve taramadan sonra risk skoruna göre renk değiştiriyor. Web arayüzünün CLI'de olmayan iki
-özelliği:
+hazır riskli/güvenli/tüm-seviyeler örneklerini yükle; bulgular sunucuya göre gruplanır, severity'e
+göre filtrelenir, raporlar JSON/HTML olarak indirilebilir. Yukarıdaki minik parlayan maskot Wisp —
+başlığın yanında duruyor ve taramadan sonra risk skoruna göre renk değiştiriyor. Web arayüzünün
+CLI'de olmayan birkaç özelliği:
 
 - **CVE eşleştirmesi** (varsayılan açık, kapatılabilir): her sunucu paketini
   [osv.dev](https://osv.dev) ile karşılaştırıp bilinen güvenlik açıklarını R010 bulgusu olarak
@@ -98,6 +98,13 @@ duruyor ve taramadan sonra risk skoruna göre renk değiştiriyor. Web arayüzü
 - **MCP CVE akışı**: "Model Context Protocol" geçen güncel CVE'leri izleyen bir panel ([NVD](https://nvd.nist.gov)
   anahtar kelime aramasıyla), `serve` çalıştığı sürece arka planda 6 saatte bir otomatik
   yenilenir, ayrıca elle yenileme butonu da var.
+- **EN/TR dil değiştirici**: tüm arayüz metnini İngilizce/Türkçe arasında değiştirir. CVE akışı
+  bir adım daha ileri gidiyor — TR'ye geçince o an gösterilen CVE özetlerini ücretsiz
+  [MyMemory](https://mymemory.translated.net) API'siyle makine çevirisiyle Türkçeleştiriyor.
+- **Gizlilik: maskelenmiş path'ler**: home dizinin altındaki her dosya yolu, bir insanın baktığı
+  her yerde — dosya listesi, bulgu kartları, CLI terminal çıktısı — `/Users/****/...` (ya da
+  platform karşılığı) olarak gösteriliyor, böylece ekran görüntüleri kullanıcı adını sızdırmıyor.
+  Ham JSON çıktısı bilerek maskelenmiyor, çünkü programatik kullanım için.
 
 ## Neden varsayılan olarak sadece config (canlı bağlantı yok)?
 

@@ -85,15 +85,23 @@ wisp serve
 
 Opens a local dashboard (default `http://127.0.0.1:8765`) for scanning interactively instead of
 via the terminal: pick from auto-discovered configs, drag & drop a file, or load the bundled
-risky/safe examples; findings are grouped by server with severity filters, and reports can be
-downloaded as JSON or HTML. Wisp — the little glowing mascot up top — sits next to the header and
-changes color with your risk score once you scan. Two things the web UI does that the CLI doesn't:
+risky/safe/all-severities examples; findings are grouped by server with severity filters, and
+reports can be downloaded as JSON or HTML. Wisp — the little glowing mascot up top — sits next to
+the header and changes color with your risk score once you scan. A few things the web UI does
+that the CLI doesn't:
 
 - **CVE matching** (on by default, toggleable): cross-references every server package against
   [osv.dev](https://osv.dev) and flags known vulnerabilities as R010 findings.
 - **MCP CVE feed**: a panel tracking recently published CVEs that mention "Model Context
   Protocol" (via the [NVD](https://nvd.nist.gov) keyword search), refreshed automatically in the
   background every 6 hours while `serve` is running, plus a manual refresh button.
+- **EN/TR language toggle**: switches all UI copy between English and Turkish. The CVE feed goes
+  further — switching to TR machine-translates the currently fetched CVE summaries (via the free
+  [MyMemory](https://mymemory.translated.net) API), so you can skim them in Turkish too.
+- **Privacy-masked paths**: any file path under your home directory is shown as `/Users/****/...`
+  (or the platform equivalent) everywhere a human looks at it — the file list, finding cards, and
+  CLI terminal output — so screenshots don't leak your username. Raw JSON output is left unmasked
+  since it's meant for programmatic use.
 
 ## Why config-only (no live connection) by default?
 
