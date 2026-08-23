@@ -9,4 +9,4 @@ venv/
 .DS_Store
 *.html
 !examples/*.html
-!src/mcpsentinel/static/*.html
+!src/wisp/static/*.html

@@ -1,4 +1,10 @@
-# mcp-sentinel
+<p align="center">
+  <img src="assets/wisp.svg" width="90" alt="Wisp mascot">
+</p>
+
+<h1 align="center">Wisp</h1>
+
+<p align="center"><em>Türkçe: <a href="README.tr.md">README.tr.md</a></em></p>
 
 A static security scanner for [Model Context Protocol](https://modelcontextprotocol.io) (MCP)
 server configurations — the config files that tell Claude Desktop, Cursor, VS Code, and other
@@ -6,8 +12,8 @@ AI clients which tools an agent is allowed to call.
 
 As agentic AI adoption accelerates, misconfigured or malicious MCP servers are becoming a real
 attack surface: a config can hand an agent a raw shell, an unpinned package that can change
-underneath you, a hardcoded API key, or a remote endpoint you've never audited. `mcp-sentinel`
-finds that class of problem *before* you run the server, without ever connecting to it.
+underneath you, a hardcoded API key, or a remote endpoint you've never audited. Wisp finds that
+class of problem *before* you run the server, without ever connecting to it.
 
 ## What it checks for
 
@@ -46,26 +52,26 @@ pip install -e ".[web]"
 ```bash
 # Auto-discover known client configs (Claude Desktop, Cursor, VS Code, Windsurf)
 # plus any .mcp.json in the current project, and scan them all:
-mcp-sentinel scan
+wisp scan
 
 # Scan a specific file:
-mcp-sentinel scan --config path/to/mcp.json
+wisp scan --config path/to/mcp.json
 
 # Write JSON/HTML reports (HTML is a shareable one-pager):
-mcp-sentinel scan --json report.json --html report.html
+wisp scan --json report.json --html report.html
 
 # Also cross-reference server packages against known CVEs via osv.dev
 # (the only flag that makes a network call; off by default):
-mcp-sentinel scan --check-cve
+wisp scan --check-cve
 
 # CI mode — exit non-zero if anything HIGH or above is found:
-mcp-sentinel scan --fail-on HIGH
+wisp scan --fail-on HIGH
 ```
 
 ## Example
 
 ```bash
-mcp-sentinel scan --config examples/risky-config.json
+wisp scan --config examples/risky-config.json
 ```
 
 See [`examples/`](examples/) for a deliberately risky sample config and the report it produces.
@@ -73,13 +79,14 @@ See [`examples/`](examples/) for a deliberately risky sample config and the repo
 ## Web UI
 
 ```bash
-mcp-sentinel serve
+wisp serve
 ```
 
 Opens a local dashboard (default `http://127.0.0.1:8765`) for scanning interactively instead of
 via the terminal: pick from auto-discovered configs, drag & drop a file, or load the bundled
 risky/safe examples; findings are grouped by server with severity filters, and reports can be
-downloaded as JSON or HTML. Two things it does that the CLI doesn't:
+downloaded as JSON or HTML. Wisp — the little glowing mascot up top — sits next to the header and
+changes color with your risk score once you scan. Two things the web UI does that the CLI doesn't:
 
 - **CVE matching** (on by default, toggleable): cross-references every server package against
   [osv.dev](https://osv.dev) and flags known vulnerabilities as R010 findings.

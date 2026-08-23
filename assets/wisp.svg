@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100" height="120" role="img" aria-label="Wisp">
+  <title>Wisp</title>
+  <defs>
+    <radialGradient id="wispGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7ee8fa" stop-opacity="0.9"/>
+      <stop offset="70%" stop-color="#7ee8fa" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#7ee8fa" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="wispBlur" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+  </defs>
+  <style>
+    .wisp-root { animation: wispFloat 3.2s ease-in-out infinite; }
+    .wisp-glow { animation: wispPulse 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    .wisp-body { fill: #eafcff; stroke: #bdebf5; stroke-width: 0.6; filter: drop-shadow(0 0 6px #7ee8fa); }
+    .wisp-eye { fill: #12333a; animation: wispBlink 4.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    .spark { fill: #7ee8fa; opacity: 0; }
+    .spark.s1 { animation: sparkDrift 3.6s ease-in-out infinite; }
+    .spark.s2 { animation: sparkDrift 4.2s ease-in-out infinite 0.9s; }
+    .spark.s3 { animation: sparkDrift 3.9s ease-in-out infinite 1.7s; }
+    @keyframes wispFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes wispPulse { 0%, 100% { opacity: 0.55; transform: scale(1); } 50% { opacity: 0.85; transform: scale(1.15); } }
+    @keyframes wispBlink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+    @keyframes sparkDrift { 0% { opacity: 0; transform: translateY(0) scale(0.6); } 30% { opacity: 0.9; } 100% { opacity: 0; transform: translateY(-22px) scale(1); } }
+  </style>
+  <g class="wisp-root">
+    <ellipse class="wisp-glow" cx="50" cy="60" rx="34" ry="42" fill="url(#wispGlow)" filter="url(#wispBlur)"/>
+    <circle class="spark s1" cx="20" cy="30" r="2.2"/>
+    <circle class="spark s2" cx="80" cy="70" r="2.2"/>
+    <circle class="spark s3" cx="38" cy="100" r="2.2"/>
+    <path class="wisp-body" d="M50 10 C 68 26, 72 50, 58 68 C 52 76, 48 80, 50 84 C 40 80, 28 66, 30 48 C 32 28, 40 14, 50 10 Z"/>
+    <circle class="wisp-eye" cx="50" cy="46" r="3.2"/>
+  </g>
+</svg>

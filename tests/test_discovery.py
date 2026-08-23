@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from mcpsentinel import discovery
+from wisp import discovery
 
 
 def test_parse_config_text_matches_parse_config_file(tmp_path):

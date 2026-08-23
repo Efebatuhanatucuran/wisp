@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
 
-from mcpsentinel import scanner
-from mcpsentinel.models import Finding, Severity
+from wisp import scanner
+from wisp.models import Finding, Severity
 
 
 def test_scan_inline_files_only(monkeypatch):

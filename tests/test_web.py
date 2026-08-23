@@ -7,10 +7,10 @@ pytest.importorskip("fastapi")
 
 from fastapi.testclient import TestClient
 
-from mcpsentinel import cve as cve_module
-from mcpsentinel import discovery
-from mcpsentinel.models import Finding, Severity
-from mcpsentinel.web import create_app
+from wisp import cve as cve_module
+from wisp import discovery
+from wisp.models import Finding, Severity
+from wisp.web import create_app
 
 
 @pytest.fixture

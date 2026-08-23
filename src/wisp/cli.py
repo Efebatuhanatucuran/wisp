@@ -12,10 +12,10 @@ from .models import Severity
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="mcp-sentinel",
-        description="Static security scanner for Model Context Protocol (MCP) server configs.",
+        prog="wisp",
+        description="Wisp: a static security scanner for Model Context Protocol (MCP) server configs.",
     )
-    parser.add_argument("--version", action="version", version=f"mcp-sentinel {__version__}")
+    parser.add_argument("--version", action="version", version=f"wisp {__version__}")
 
     sub = parser.add_subparsers(dest="cmd", required=True)
 
@@ -103,7 +103,7 @@ def main(argv: list[str] | None = None) -> int:
         if not args.no_browser:
             threading.Timer(1.0, lambda: webbrowser.open(url)).start()
 
-        console.print(f"[cyan]mcp-sentinel web UI running at {url} (Ctrl+C to stop)[/cyan]")
+        console.print(f"[cyan]Wisp web UI running at {url} (Ctrl+C to stop)[/cyan]")
         uvicorn.run(create_app(), host=args.host, port=args.port, log_level="warning")
         return 0
 

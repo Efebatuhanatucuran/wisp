@@ -51,7 +51,7 @@ async def _lifespan(app: FastAPI):
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="mcp-sentinel", lifespan=_lifespan)
+    app = FastAPI(title="Wisp", lifespan=_lifespan)
 
     @app.get("/api/discover")
     def api_discover(project_dir: str | None = None) -> dict:
@@ -87,7 +87,7 @@ def create_app() -> FastAPI:
         html = report.to_html(_run_scan(req))
         return HTMLResponse(
             content=html,
-            headers={"Content-Disposition": 'attachment; filename="mcp-sentinel-report.html"'},
+            headers={"Content-Disposition": 'attachment; filename="wisp-report.html"'},
         )
 
     @app.get("/api/cve-feed")

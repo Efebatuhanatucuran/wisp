@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from mcpsentinel import cve
-from mcpsentinel.models import ServerEntry, Severity
+from wisp import cve
+from wisp.models import ServerEntry, Severity
 
 
 def _entry(command, args) -> ServerEntry:

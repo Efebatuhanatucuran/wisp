@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "mcp-sentinel"
+name = "wisp"
 version = "0.1.0"
-description = "Static security scanner for Model Context Protocol (MCP) server configurations"
+description = "Wisp: a static security scanner for Model Context Protocol (MCP) server configurations"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
@@ -23,13 +23,13 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/efebatuhanatucuran/mcp-sentinel"
+Homepage = "https://github.com/Efebatuhanatucuran/wisp"
 
 [project.scripts]
-mcp-sentinel = "mcpsentinel.cli:main"
+wisp = "wisp.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/mcpsentinel"]
+packages = ["src/wisp"]
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0.0", "httpx2"]

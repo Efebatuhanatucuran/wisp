@@ -1,6 +1,6 @@
 """Live CVE/advisory lookups: matches MCP server packages against known
 vulnerabilities (osv.dev) and tracks recently published MCP-related CVEs
-(NVD keyword search). Unlike the rest of mcpsentinel, everything in this
+(NVD keyword search). Unlike the rest of wisp, everything in this
 module makes network calls and fails open (returns empty results) on any
 network error so a lookup outage never breaks a scan."""
 

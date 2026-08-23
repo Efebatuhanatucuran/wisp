@@ -1,5 +1,5 @@
 const SEVERITIES = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"];
-const STORAGE_KEY = "mcp-sentinel:web-ui:v1";
+const STORAGE_KEY = "wisp:web-ui:v1";
 
 let nextId = 1;
 
@@ -384,7 +384,7 @@ document.querySelectorAll(".link-btn[data-example]").forEach((btn) => {
 
 el.downloadJsonBtn.addEventListener("click", () => {
   if (!state.lastResult) return;
-  downloadBlob(JSON.stringify(state.lastResult, null, 2), "mcp-sentinel-report.json", "application/json");
+  downloadBlob(JSON.stringify(state.lastResult, null, 2), "wisp-report.json", "application/json");
 });
 
 el.downloadHtmlBtn.addEventListener("click", async () => {
@@ -402,7 +402,7 @@ el.downloadHtmlBtn.addEventListener("click", async () => {
     });
     if (!res.ok) throw new Error(`report failed: ${res.status}`);
     const html = await res.text();
-    downloadBlob(html, "mcp-sentinel-report.html", "text/html");
+    downloadBlob(html, "wisp-report.html", "text/html");
   } catch (err) {
     showError(`Could not generate HTML report: ${err.message}`);
   }

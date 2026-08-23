@@ -29,7 +29,7 @@ def print_terminal_report(result: ScanResult, console: Console | None = None) ->
         console.print(Panel(
             "No MCP config files found. Pass a path explicitly with --config, or run "
             "from a project that has a .mcp.json.",
-            title="mcp-sentinel", border_style="yellow",
+            title="Wisp", border_style="yellow",
         ))
         return
 
@@ -37,7 +37,7 @@ def print_terminal_report(result: ScanResult, console: Console | None = None) ->
         f"[bold]{result.servers_scanned}[/bold] server(s) across "
         f"[bold]{len(result.files_scanned)}[/bold] config file(s)\n"
         + "\n".join(f"  • {p}" for p in result.files_scanned),
-        title="mcp-sentinel scan", border_style="cyan",
+        title="Wisp scan", border_style="cyan",
     ))
 
     if result.findings:
@@ -106,7 +106,7 @@ _HTML_TEMPLATE = """<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>mcp-sentinel report</title>
+<title>Wisp report</title>
 <style>
   :root {{ color-scheme: light dark; }}
   body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -134,7 +134,7 @@ _HTML_TEMPLATE = """<!doctype html>
 </style>
 </head>
 <body>
-<h1>mcp-sentinel report</h1>
+<h1>Wisp report</h1>
 <div class="meta">Generated {generated_at} &middot; {servers} server(s) across {files} config file(s)</div>
 <div class="score">Risk score: {score}/100</div>
 {body}

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from mcpsentinel import discovery, rules
+from wisp import discovery, rules
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -49,7 +49,7 @@ def test_privileged_docker_flagged():
 
 
 def test_risk_score_lower_for_risky_config():
-    from mcpsentinel.models import ScanResult
+    from wisp.models import ScanResult
 
     safe_entries = discovery.parse_config_file(FIXTURES / "safe.mcp.json")
     risky_entries = discovery.parse_config_file(FIXTURES / "risky.mcp.json")
